@@ -208,6 +208,17 @@ switched_rules = use_extension("@com_google_googleapis//:extensions.bzl", "switc
 
 switched_rules.use_languages(java = True)
 
+# Prebuilt protoc binaries — makes @prebuilt_protoc.* repos visible to this module
+# so compiler/BUILD.bazel can alias protoc to the right platform binary.
+prebuilt_protoc = use_extension("@com_google_protobuf//bazel/private/oss/toolchains/prebuilt:protoc_extension.bzl", "protoc")
+use_repo(
+    prebuilt_protoc,
+    "prebuilt_protoc.linux_aarch_64",
+    "prebuilt_protoc.linux_x86_64",
+    "prebuilt_protoc.osx_aarch_64",
+    "prebuilt_protoc.osx_x86_64",
+)
+
 # Prebuilt protoc-gen-grpc-java plugin binaries — replaces the cc_binary in
 # compiler/BUILD.bazel to avoid building grpc_java_plugin from C++ source,
 # which would pull in @com_google_protobuf//:protoc_lib.
