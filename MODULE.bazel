@@ -157,3 +157,43 @@ maven.override(
     coordinates = "io.grpc:grpc-util",
     target = "@io_grpc_grpc_java//util",
 )
+
+# Prebuilt protoc binaries — makes @prebuilt_protoc.* repos visible to this module
+# so compiler/BUILD.bazel can alias protoc to the right platform binary.
+prebuilt_protoc = use_extension("@com_google_protobuf//bazel/private/oss/toolchains/prebuilt:protoc_extension.bzl", "protoc")
+use_repo(
+    prebuilt_protoc,
+    "prebuilt_protoc.linux_aarch_64",
+    "prebuilt_protoc.linux_x86_64",
+    "prebuilt_protoc.osx_aarch_64",
+    "prebuilt_protoc.osx_x86_64",
+)
+
+# Prebuilt protoc-gen-grpc-java plugin binaries — replaces the cc_binary in
+# compiler/BUILD.bazel to avoid building grpc_java_plugin from C++ source,
+# which would pull in @com_google_protobuf//:protoc_lib.
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "protoc_gen_grpc_java_linux_x86_64",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "3d16b70b18854988b29c41e20d06ca3358c47008edb9e6986b926c5bca790816",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.79.0/protoc-gen-grpc-java-1.79.0-linux-x86_64.exe",
+)
+
+http_file(
+    name = "protoc_gen_grpc_java_linux_aarch_64",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "445b924ba4d3f55abd651f71017d592552be706b3918af0d7837b70468137473",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.79.0/protoc-gen-grpc-java-1.79.0-linux-aarch_64.exe",
+)
+
+http_file(
+    name = "protoc_gen_grpc_java_osx",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "7b0dcbe2cbc02ebaf03e571eb295f43c0ba3d919b5d9e8fe34015846c9887289",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.79.0/protoc-gen-grpc-java-1.79.0-osx-aarch_64.exe",
+)

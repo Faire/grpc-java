@@ -1,20 +1,47 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//:java_grpc_library.bzl", "java_rpc_toolchain")
 
-# This should not generally be referenced. Users should use java_grpc_library
-cc_binary(
+# Use a prebuilt protoc-gen-grpc-java plugin binary instead of building from
+# source, which would require compiling protobuf's C++ library (protoc_lib).
+alias(
     name = "grpc_java_plugin",
-    srcs = [
-        "src/java_plugin/cpp/java_generator.cpp",
-        "src/java_plugin/cpp/java_generator.h",
-        "src/java_plugin/cpp/java_plugin.cpp",
-    ],
+    actual = select({
+        ":linux_aarch64": "@protoc_gen_grpc_java_linux_aarch_64//file",
+        ":linux_x86_64": "@protoc_gen_grpc_java_linux_x86_64//file",
+        "//conditions:default": "@protoc_gen_grpc_java_osx//file",
+    }),
     visibility = ["//visibility:public"],
-    deps = [
-        "@com_google_protobuf//:protoc_lib",
+)
+
+config_setting(
+    name = "linux_x86_64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:x86_64",
     ],
+)
+
+config_setting(
+    name = "linux_aarch64",
+    constraint_values = [
+        "@platforms//os:linux",
+        "@platforms//cpu:aarch64",
+    ],
+)
+
+# Prebuilt protoc binary wrapped as an executable target, used by java_rpc_toolchain
+# instead of building @com_google_protobuf//:protoc from C++ source.
+native_binary(
+    name = "protoc",
+    src = select({
+        ":linux_aarch64": "@prebuilt_protoc.linux_aarch_64//:bin/protoc",
+        ":linux_x86_64": "@prebuilt_protoc.linux_x86_64//:bin/protoc",
+        "//conditions:default": "@prebuilt_protoc.osx_aarch_64//:bin/protoc",
+    }),
+    out = "protoc",
+    visibility = ["//visibility:public"],
 )
 
 java_library(
