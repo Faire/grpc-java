@@ -40,7 +40,7 @@ java_rpc_toolchain = rule(
         "plugin_arg": attr.string(),
         "_protoc": attr.label(
             cfg = "exec",
-            default = Label("@com_google_protobuf//:protoc"),
+            default = Label("//compiler:protoc"),
             executable = True,
         ),
         "java_plugins": attr.label_list(

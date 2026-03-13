@@ -30,6 +30,17 @@ config_setting(
     ],
 )
 
+# Prebuilt protoc binary, used by java_rpc_toolchain instead of @com_google_protobuf//:protoc.
+alias(
+    name = "protoc",
+    actual = select({
+        ":linux_aarch64": "@prebuilt_protoc.linux_aarch_64//:bin/protoc",
+        ":linux_x86_64": "@prebuilt_protoc.linux_x86_64//:bin/protoc",
+        "//conditions:default": "@prebuilt_protoc.osx_aarch_64//:bin/protoc",
+    }),
+    visibility = ["//visibility:public"],
+)
+
 java_library(
     name = "java_grpc_library_deps__do_not_reference",
     exports = [
