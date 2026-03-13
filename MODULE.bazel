@@ -206,3 +206,32 @@ maven.override(
 switched_rules = use_extension("@com_google_googleapis//:extensions.bzl", "switched_rules")
 
 switched_rules.use_languages(java = True)
+
+# Prebuilt protoc-gen-grpc-java plugin binaries — replaces the cc_binary in
+# compiler/BUILD.bazel to avoid building grpc_java_plugin from C++ source,
+# which would pull in @com_google_protobuf//:protoc_lib.
+http_file = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "http_file")
+
+http_file(
+    name = "protoc_gen_grpc_java_linux_x86_64",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "50cf1f126c07a7b775808211087b537cc0482f79e9207e7a14110e5e3536c12f",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.71.0/protoc-gen-grpc-java-1.71.0-linux-x86_64.exe",
+)
+
+http_file(
+    name = "protoc_gen_grpc_java_linux_aarch_64",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "e00efd7ff27bd47a0ddd9e45aff1f8634066fc957cdbc1ee554b3b6b999abd8f",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.71.0/protoc-gen-grpc-java-1.71.0-linux-aarch_64.exe",
+)
+
+http_file(
+    name = "protoc_gen_grpc_java_osx",
+    downloaded_file_path = "protoc-gen-grpc-java",
+    executable = True,
+    sha256 = "ccf5bb04c8f0a938bc029f5d7a97229b7820295111b4ee0ebbfd3fec281c63b7",
+    url = "https://repo1.maven.org/maven2/io/grpc/protoc-gen-grpc-java/1.71.0/protoc-gen-grpc-java-1.71.0-osx-aarch_64.exe",
+)
