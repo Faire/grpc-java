@@ -1,3 +1,4 @@
+load("@bazel_skylib//rules:native_binary.bzl", "native_binary")
 load("@rules_java//java:defs.bzl", "java_library")
 load("@rules_jvm_external//:defs.bzl", "artifact")
 load("//:java_grpc_library.bzl", "java_rpc_toolchain")
@@ -30,14 +31,16 @@ config_setting(
     ],
 )
 
-# Prebuilt protoc binary, used by java_rpc_toolchain instead of @com_google_protobuf//:protoc.
-alias(
+# Prebuilt protoc binary wrapped as an executable target, used by java_rpc_toolchain
+# instead of building @com_google_protobuf//:protoc from C++ source.
+native_binary(
     name = "protoc",
-    actual = select({
+    src = select({
         ":linux_aarch64": "@prebuilt_protoc.linux_aarch_64//:bin/protoc",
         ":linux_x86_64": "@prebuilt_protoc.linux_x86_64//:bin/protoc",
         "//conditions:default": "@prebuilt_protoc.osx_aarch_64//:bin/protoc",
     }),
+    out = "protoc",
     visibility = ["//visibility:public"],
 )
 
